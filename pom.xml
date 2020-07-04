@@ -14,10 +14,10 @@
         <module>spring-boot-jdbc</module>
     </modules>
     <properties>
-        <spring.boot.version>2.2.5.RELEASE</spring.boot.version>
+        <spring.boot.version>2.3.1.RELEASE</spring.boot.version>
         <guava.version>23.0</guava.version>
         <mybatis-springboot.version>2.1.2</mybatis-springboot.version>
-        <druid.version>1.1.21</druid.version>
+        <druid.version>1.1.22</druid.version>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <java.version>1.8</java.version>
