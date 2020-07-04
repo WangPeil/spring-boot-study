@@ -12,6 +12,10 @@
     <modules>
         <module>spring-boot-init</module>
         <module>spring-boot-jdbc</module>
+        <module>spring-boot-multi-datasource</module>
+        <module>spring-boot-redis</module>
+        <module>spring-boot-kafka</module>
+        <module>spring-boot-elasticsearch</module>
     </modules>
     <properties>
         <spring.boot.version>2.3.1.RELEASE</spring.boot.version>
