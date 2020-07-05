@@ -12,11 +12,15 @@ import java.io.Serializable;
 @Service
 public class RedisService {
 
-    @Autowired
     private RedisTemplate<String, Serializable> redisTemplate;
 
+    @Autowired
+    public RedisService(RedisTemplate<String, Serializable> redisTemplate) {
+        this.redisTemplate = redisTemplate;
+    }
+
     public void addValue(Serializable obj) {
-        redisTemplate.opsForValue().set("user",obj);
+        redisTemplate.opsForValue().set("user", obj);
     }
 
 }
