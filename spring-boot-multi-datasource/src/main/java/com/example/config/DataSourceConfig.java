@@ -1,15 +1,15 @@
 package com.example.config;
 
-import com.alibaba.druid.pool.DruidDataSource;
-import com.example.properties.DataBase1Properties;
-import com.example.properties.DataBase2Properties;
-import lombok.extern.slf4j.Slf4j;
+import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 
 import javax.sql.DataSource;
 
@@ -19,57 +19,67 @@ import javax.sql.DataSource;
  * @Description:
  */
 @Configuration
-@Slf4j
 public class DataSourceConfig {
-    private DataBase1Properties dataBase1Properties;
-    private DataBase2Properties dataBase2Properties;
 
-    @Autowired
-    public DataSourceConfig(DataBase1Properties dataBase1Properties, DataBase2Properties dataBase2Properties) {
-        this.dataBase1Properties = dataBase1Properties;
-        this.dataBase2Properties = dataBase2Properties;
-    }
 
     /**
-     * 获取DataSource bean
-     *
-     * @return bean
+     * 配置bean
+     * @return
      */
-    @Bean(name = "dataBase1DataSource")
+    @Bean
     @Primary
-    public DataSource dataBase1DataSource() {
-        log.info("==============dataBase1DataSource初始化=================");
-        DruidDataSource dataSource = new DruidDataSource();
-        dataSource.setDriverClassName(dataBase1Properties.getDriverClassName());
-        dataSource.setUrl(dataBase1Properties.getUrl());
-        dataSource.setUsername(dataBase1Properties.getUsername());
-        dataSource.setPassword(dataBase1Properties.getPassword());
-        return dataSource;
+    @ConfigurationProperties(prefix = "spring.datasource.database1")
+    public DataSourceProperties dataSources1() {
+        return new DataSourceProperties();
     }
 
-    @Bean(name = "dataBase2DataSource")
-    public DataSource dataBase2DataSource() {
-        log.info("==============dataBase2DataSource初始化=================");
-        DruidDataSource dataSource = new DruidDataSource();
-        dataSource.setDriverClassName(dataBase2Properties.getDriverClassName());
-        dataSource.setUrl(dataBase2Properties.getUrl());
-        dataSource.setUsername(dataBase2Properties.getUsername());
-        dataSource.setPassword(dataBase2Properties.getPassword());
-        return dataSource;
-    }
-
-    @Bean(name = "dataBase1Factory")
+    @Bean("dataSource1")
     @Primary
-    public SqlSessionFactoryBean dataBase1Factory(@Qualifier("dataBase1DataSource") DataSource dataSource) {
-        SqlSessionFactoryBean sqlSessionFactoryBean = new SqlSessionFactoryBean();
-        sqlSessionFactoryBean.setDataSource(dataSource);
-        return sqlSessionFactoryBean;
+    public DataSource dataSource1(@Qualifier("dataSources1")DataSourceProperties dataSourceProperties) {
+        return dataSourceProperties.initializeDataSourceBuilder().build();
+    }
+    /**
+     * 配置bean
+     * @return
+     */
+    @Bean
+    @ConfigurationProperties(prefix = "spring.datasource.database2")
+    public DataSourceProperties dataSources2() {
+        return new DataSourceProperties();
     }
 
-    @Bean(name = "dataBase2Factory")
-    public SqlSessionFactoryBean dataBase2Factory(@Qualifier("dataBase2DataSource") DataSource dataSource) {
-        SqlSessionFactoryBean sqlSessionFactoryBean = new SqlSessionFactoryBean();
-        sqlSessionFactoryBean.setDataSource(dataSource);
-        return sqlSessionFactoryBean;
+    @Bean("dataSource2")
+    public DataSource dataSource2(@Qualifier("dataSources2")DataSourceProperties dataSourceProperties) {
+        return dataSourceProperties.initializeDataSourceBuilder().build();
+    }
+
+
+    @Bean("sqlSessionFactory1")
+    @Primary
+    public SqlSessionFactory sqlSessionFactory1(@Qualifier("dataSource1")DataSource dataSource) throws Exception {
+        SqlSessionFactoryBean sqlSessionFactory = new SqlSessionFactoryBean();
+        sqlSessionFactory.setDataSource(dataSource);
+        sqlSessionFactory.setMapperLocations(new PathMatchingResourcePatternResolver().getResource("classpath:mapper/*.xml"));
+        return sqlSessionFactory.getObject();
+    }
+
+    @Bean
+    @Primary
+    public DataSourceTransactionManager dataSourceTransactionManager1(@Qualifier("dataSource1")DataSource dataSource) {
+        return new DataSourceTransactionManager(dataSource);
+    }
+
+
+    @Bean("sqlSessionFactory2")
+    public SqlSessionFactory sqlSessionFactory2(@Qualifier("dataSource2") DataSource dataSource) throws Exception {
+        SqlSessionFactoryBean sqlSessionFactory = new SqlSessionFactoryBean();
+        sqlSessionFactory.setDataSource(dataSource);
+        sqlSessionFactory.setMapperLocations(new PathMatchingResourcePatternResolver().getResource("classpath:mapper/*.xml"));
+        return sqlSessionFactory.getObject();
+    }
+
+    @Bean
+    public DataSourceTransactionManager dataSourceTransactionManager2(@Qualifier("dataSource2") DataSource dataSource){
+        return new DataSourceTransactionManager(dataSource);
     }
 }
