@@ -13,16 +13,21 @@ import org.elasticsearch.action.get.GetRequest;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
+import org.elasticsearch.action.search.SearchRequest;
+import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.support.master.AcknowledgedResponse;
 import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.action.update.UpdateResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.indices.*;
+import org.elasticsearch.common.Strings;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.common.xcontent.XContentType;
+import org.elasticsearch.index.query.*;
 import org.elasticsearch.rest.RestStatus;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +35,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 /**
  * @author wangpeil
@@ -145,7 +151,7 @@ public class EsService {
      * @return
      * @throws IOException
      */
-    public String search() throws IOException {
+    public String get() throws IOException {
         GetRequest request = new GetRequest("first_index", "1");
         try {
             GetResponse response = client.get(request, RequestOptions.DEFAULT);
@@ -161,7 +167,50 @@ public class EsService {
     }
 
     /**
+     * 根据条件查询
+     *
+     * @return
+     * @throws IOException
+     */
+    public String search() throws IOException {
+        // 构建查询资源
+        SearchSourceBuilder builder = new SearchSourceBuilder();
+        // 设置查询结果的分页
+        builder.from(0);
+        builder.size(10);
+        builder.fetchSource(new String[]{"*"}, Strings.EMPTY_ARRAY);
+
+        // 构建match查询
+        MatchQueryBuilder matchQueryBuilder = QueryBuilders.matchQuery("name", 3);
+        // 构建exists查询
+        ExistsQueryBuilder existsQueryBuilder = QueryBuilders.existsQuery("name");
+        // 构建term查询
+        TermQueryBuilder termQueryBuilder = QueryBuilders.termQuery("name", 3);
+        // 构建range查询
+        RangeQueryBuilder rangeQueryBuilder = QueryBuilders.rangeQuery("datetime")
+                .lte("2020-08-14")
+                .gte("2020-08-13");
+
+        // 构建bool查询
+        BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery()
+                .must(matchQueryBuilder)
+                .mustNot(existsQueryBuilder)
+                .should(termQueryBuilder)
+                .filter(rangeQueryBuilder);
+
+        builder.query(boolQueryBuilder);
+
+        SearchRequest request = new SearchRequest("first_index");
+        request.source(builder);
+
+        SearchResponse response = client.search(request, RequestOptions.DEFAULT);
+        System.out.println(response.status());
+        return Arrays.toString(response.getHits().getHits());
+    }
+
+    /**
      * 更新文档
+     *
      * @throws IOException
      */
     public void update() throws IOException {
@@ -175,6 +224,7 @@ public class EsService {
 
     /**
      * 删除文档
+     *
      * @throws IOException
      */
     public void delete() throws IOException {
