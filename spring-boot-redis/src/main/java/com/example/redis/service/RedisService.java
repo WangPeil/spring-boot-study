@@ -12,7 +12,7 @@ import java.io.Serializable;
 @Service
 public class RedisService {
 
-    private RedisTemplate<String, Serializable> redisTemplate;
+    private final RedisTemplate<String, Serializable> redisTemplate;
 
     @Autowired
     public RedisService(RedisTemplate<String, Serializable> redisTemplate) {

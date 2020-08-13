@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserController {
     private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-    private UserService userService;
+    private final UserService userService;
 
     @Autowired
     public UserController(UserService userService) {

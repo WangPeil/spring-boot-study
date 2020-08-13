@@ -3,6 +3,9 @@ package com.example.elasticsearch;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+/**
+ * @author wangpeil
+ */
 @SpringBootApplication
 public class ElasticsearchApplication {
 
