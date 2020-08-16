@@ -19,7 +19,7 @@
         <module>spring-boot-mybatis</module>
     </modules>
     <properties>
-        <spring.boot.version>2.3.1.RELEASE</spring.boot.version>
+        <spring.boot.version>2.3.3.RELEASE</spring.boot.version>
         <guava.version>23.0</guava.version>
         <mybatis-springboot.version>2.1.2</mybatis-springboot.version>
         <druid.version>1.1.22</druid.version>
