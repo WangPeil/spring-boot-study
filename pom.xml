@@ -17,6 +17,7 @@
         <module>spring-boot-kafka</module>
         <module>spring-boot-elasticsearch</module>
         <module>spring-boot-mybatis</module>
+        <module>annotation</module>
     </modules>
     <properties>
         <spring.boot.version>2.3.3.RELEASE</spring.boot.version>
